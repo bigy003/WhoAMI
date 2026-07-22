@@ -7,8 +7,11 @@
 <meta name="description" content="Past, present, and future — Bryan's story told as a feed.">
 <meta property="og:title" content="@bryan — a life, scrolled">
 <meta property="og:description" content="Who I was · Who I am · Who I will be">
+<meta property="og:image" content="profile.jpeg">
+<meta property="og:type" content="website">
+<link rel="icon" href="profile.jpeg" type="image/jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#f5f2ec;
@@ -140,6 +143,20 @@
     padding:32px 20px 28px;
     text-align:center;
   }
+  .hero-avatar-wrap{
+    margin-bottom:20px;
+  }
+  .hero-avatar{
+    width:88px;
+    height:88px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid var(--line);
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:transform 0.2s, box-shadow 0.2s;
+  }
+  .hero-avatar:active{ transform:scale(0.96); }
   .hero-eyebrow{
     font-size:11px;
     font-weight:600;
@@ -210,8 +227,16 @@
     line-height:1.5;
   }
 
-  .section-past{ background:var(--past-bg); border-top:1px solid var(--past-border); }
+  .section-past{ background:var(--past-bg); border-top:1px solid var(--past-border); position:relative; }
   .section-past .section-head h2{ color:var(--past); }
+  .section-past::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    opacity:0.035;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
   .section-present{ background:var(--surface); border-top:1px solid var(--line); }
   .section-present .section-head h2{ color:var(--present); }
   .section-future{ background:var(--future-bg); border-top:1px solid var(--future-border); }
@@ -231,6 +256,13 @@
     border:1px solid var(--line);
     overflow:hidden;
     box-shadow:var(--shadow);
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity 0.55s ease, transform 0.55s cubic-bezier(0.22,1,0.36,1);
+  }
+  .post.reveal{
+    opacity:1;
+    transform:translateY(0);
   }
   .post-meta{
     display:flex;
@@ -252,6 +284,7 @@
     margin:10px 0 0;
     overflow:hidden;
     aspect-ratio:1/1;
+    cursor:pointer;
   }
   .post-img img{
     width:100%;
@@ -270,6 +303,13 @@
     font-weight:600;
     color:var(--muted);
     margin-bottom:6px;
+    cursor:pointer;
+    user-select:none;
+    transition:transform 0.2s;
+  }
+  .post-body .likes.liked{
+    color:#e11d48;
+    transform:scale(1.05);
   }
   .post-body .caption{
     font-size:14px;
@@ -279,10 +319,19 @@
   .post-body .caption b{ font-weight:600; margin-right:4px; }
 
   /* era styles */
-  .section-past .post{ background:#fffcf5; border-color:var(--past-border); }
+  .section-past .post{
+    background:#fffcf5;
+    border-color:var(--past-border);
+    box-shadow:0 2px 8px rgba(138,109,74,0.08), 0 8px 24px rgba(138,109,74,0.06);
+  }
   .section-past .avatar{ background:var(--past); color:#fff; }
-  .section-past .post-img img{ filter:sepia(0.12) saturate(0.95); }
-  .section-past .caption b{ color:var(--past); }
+  .section-past .post-img img{ filter:sepia(0.15) saturate(0.92); }
+  .section-past .caption{
+    font-family:'Caveat', cursive;
+    font-size:17px;
+    line-height:1.45;
+  }
+  .section-past .caption b{ color:var(--past); font-family:'Plus Jakarta Sans', sans-serif; font-size:14px; }
 
   .section-present .avatar{ background:var(--present); color:#fff; }
   .section-present .caption b{ color:var(--present); }
@@ -297,9 +346,15 @@
     letter-spacing:0.06em;
     text-transform:uppercase;
     color:var(--future);
-    background:rgba(124,58,237,0.1);
+    background:linear-gradient(135deg, rgba(124,58,237,0.12), rgba(37,99,235,0.12));
     padding:4px 10px;
     border-radius:999px;
+    border:1px solid rgba(124,58,237,0.2);
+    animation:future-pulse 3s ease-in-out infinite;
+  }
+  @keyframes future-pulse{
+    0%,100%{ box-shadow:0 0 0 rgba(124,58,237,0); }
+    50%{ box-shadow:0 0 14px rgba(124,58,237,0.25); }
   }
   .section-future .avatar{ background:linear-gradient(135deg, #7c3aed, #2563eb); color:#fff; }
   .section-future .caption b{ color:var(--future); }
@@ -318,6 +373,36 @@
     font-size:17px;
     font-style:italic;
     color:var(--ink);
+  }
+
+  /* chapter timeline dividers */
+  .chapter-divider{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:28px 20px 0;
+    max-width:960px;
+    margin:0 auto;
+  }
+  .chapter-divider .dot{
+    width:10px; height:10px;
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .chapter-divider .dot.past{ background:var(--past); box-shadow:0 0 0 4px var(--past-bg); }
+  .chapter-divider .dot.present{ background:var(--present); box-shadow:0 0 0 4px var(--present-bg); }
+  .chapter-divider .dot.future{ background:var(--future); box-shadow:0 0 0 4px var(--future-bg); }
+  .chapter-divider .line{
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, var(--line), transparent);
+  }
+  .chapter-divider .label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--muted);
   }
 
   /* ══════════════════════════════════════
@@ -481,6 +566,7 @@
       gap:40px;
       align-items:end;
     }
+    .hero-avatar-wrap{ display:none; }
     .hero-text{ max-width:520px; }
     .hero h1{ font-size:64px; margin-bottom:16px; }
     .hero > p{ margin-left:0; margin-right:0; margin-bottom:28px; }
@@ -553,6 +639,11 @@
       padding:56px 48px 64px;
       text-align:left;
     }
+
+    .chapter-divider{
+      padding:32px 48px 0;
+      max-width:none;
+    }
   }
 
   /* large desktop */
@@ -563,9 +654,11 @@
 
   @media(prefers-reduced-motion:reduce){
     html{ scroll-behavior:auto; }
-    .post:hover,.post-img img,.hero-tags a{ transition:none; }
+    .post,.post:hover,.post-img img,.hero-tags a{ transition:none; }
+    .post{ opacity:1; transform:none; }
     .post:hover{ transform:none; }
     .post:hover .post-img img{ transform:none; }
+    .section-future .post::after{ animation:none; }
   }
 
   /* ── LIGHTBOX (desktop) ── */
@@ -712,13 +805,41 @@
   body.lightbox-open{ overflow:hidden; }
 
   @media(min-width:1024px){
-    .post-img{
-      cursor:zoom-in;
-    }
+    .post-img{ cursor:zoom-in; }
   }
 
+  /* mobile / tablet lightbox — stacked layout */
   @media(max-width:1023px){
-    .lightbox{ display:none !important; }
+    .lightbox{ padding:0; align-items:flex-end; }
+    .lightbox-panel{
+      grid-template-columns:1fr;
+      max-width:100%;
+      max-height:92vh;
+      border-radius:20px 20px 0 0;
+      transform:translateY(100%);
+    }
+    .lightbox.open .lightbox-panel{
+      transform:translateY(0);
+    }
+    .lightbox-img-wrap{
+      min-height:0;
+      max-height:55vh;
+    }
+    .lightbox-img-wrap img{
+      max-height:55vh;
+      object-fit:contain;
+    }
+    .lightbox-content{
+      border-left:none;
+      border-top:1px solid var(--line);
+      max-height:37vh;
+    }
+    .lightbox-nav{ display:none; }
+    .lightbox-close{
+      top:10px; right:10px;
+      background:rgba(0,0,0,0.5);
+      color:#fff;
+    }
   }
 
   /* ── PROFILE VIEWER (mobile + desktop) ── */
@@ -825,6 +946,9 @@
 
     <header class="hero">
       <div class="hero-text">
+        <div class="hero-avatar-wrap">
+          <img class="hero-avatar brand-avatar" src="profile.jpeg" alt="Bryan">
+        </div>
         <div class="hero-eyebrow">English assessment · personal feed</div>
         <h1>A life, <em>scrolled</em></h1>
         <p>Three chapters of the same story : who I was, who I am, and who I'm working to become.</p>
@@ -835,11 +959,17 @@
         </div>
       </div>
       <div class="hero-stats" aria-hidden="true">
-        <div class="stat-card past-stat"><div class="num">7</div><div class="label">posts · the archive</div></div>
-        <div class="stat-card present-stat"><div class="num">7</div><div class="label">posts · right now</div></div>
-        <div class="stat-card future-stat"><div class="num">3</div><div class="label">posts · coming soon</div></div>
+        <div class="stat-card past-stat"><div class="num" data-count="7">0</div><div class="label">posts · the archive</div></div>
+        <div class="stat-card present-stat"><div class="num" data-count="7">0</div><div class="label">posts · right now</div></div>
+        <div class="stat-card future-stat"><div class="num" data-count="3">0</div><div class="label">posts · coming soon</div></div>
       </div>
     </header>
+
+    <div class="chapter-divider" aria-hidden="true">
+      <span class="dot past"></span>
+      <span class="line"></span>
+      <span class="label">Chapter 1</span>
+    </div>
 
     <!-- ═══ PAST ═══ -->
     <section class="section section-past" id="past">
@@ -936,6 +1066,12 @@
       </div>
     </section>
 
+    <div class="chapter-divider" aria-hidden="true">
+      <span class="dot present"></span>
+      <span class="line"></span>
+      <span class="label">Chapter 2</span>
+    </div>
+
     <!-- ═══ PRESENT ═══ -->
     <section class="section section-present" id="present">
       <div class="section-head">
@@ -1030,6 +1166,12 @@
 
       </div>
     </section>
+
+    <div class="chapter-divider" aria-hidden="true">
+      <span class="dot future"></span>
+      <span class="line"></span>
+      <span class="label">Chapter 3</span>
+    </div>
 
     <!-- ═══ FUTURE ═══ -->
     <section class="section section-future" id="future">
@@ -1159,12 +1301,10 @@
     e.currentTarget.classList.add('active');
   });
 
-  /* ── Lightbox (desktop only) ── */
+  /* ── Lightbox (desktop + mobile) ── */
   const lightbox = document.getElementById('lightbox');
   const allPosts = [...document.querySelectorAll('.post')];
   let currentIndex = 0;
-
-  const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
 
   function getEra(post) {
     const section = post.closest('.section');
@@ -1209,7 +1349,6 @@
 
   document.querySelectorAll('.post-img').forEach(wrap => {
     wrap.addEventListener('click', () => {
-      if (!isDesktop()) return;
       openLightbox(wrap.closest('.post'));
     });
   });
@@ -1279,6 +1418,51 @@
     if (profileViewer.classList.contains('open') && e.key === 'Escape') {
       closeProfileViewer();
     }
+  });
+
+  /* ── Scroll reveal ── */
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('reveal');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.post').forEach((post, i) => {
+    post.style.transitionDelay = `${(i % 3) * 70}ms`;
+    revealObserver.observe(post);
+  });
+
+  /* ── Stat counter (desktop) ── */
+  function animateCount(el) {
+    const target = +el.dataset.count;
+    const duration = 900;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const statsEl = document.querySelector('.hero-stats');
+  if (statsEl) {
+    const statsObserver = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        statsEl.querySelectorAll('[data-count]').forEach(animateCount);
+        statsObserver.disconnect();
+      }
+    }, { threshold: 0.5 });
+    statsObserver.observe(statsEl);
+  }
+
+  /* ── Like tap ── */
+  document.querySelectorAll('.likes').forEach(el => {
+    if (el.textContent.includes('not shipped')) return;
+    el.addEventListener('click', () => el.classList.toggle('liked'));
   });
 </script>
 </body>
