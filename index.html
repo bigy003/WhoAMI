@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>@bryan — a life, scrolled</title>
+<meta name="description" content="Past, present, and future — Bryan's story told as a feed.">
+<meta property="og:title" content="@bryan — a life, scrolled">
+<meta property="og:description" content="Who I was · Who I am · Who I will be">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f2ec;
+    --surface:#ffffff;
+    --ink:#1a1a1a;
+    --muted:#6b6560;
+    --line:#e8e2d9;
+    --past:#8a6d4a;
+    --past-bg:#f9f4ea;
+    --past-border:#e3d5b8;
+    --present:#1d4ed8;
+    --present-bg:#f0f5ff;
+    --present-border:#bfdbfe;
+    --future:#7c3aed;
+    --future-bg:#f5f0ff;
+    --future-border:#ddd6fe;
+    --radius:16px;
+    --shadow:0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+    --sidebar:240px;
+    --nav-h:56px;
+    --bottom-nav-h:64px;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    font-family:'Plus Jakarta Sans', sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  img{ max-width:100%; height:auto; }
+
+  /* ══════════════════════════════════════
+     MOBILE FIRST (default)
+  ══════════════════════════════════════ */
+
+  html{ scroll-padding-top:var(--nav-h); }
+
+  /* top nav — mobile */
+  .nav-top{
+    position:sticky;
+    top:0;
+    z-index:100;
+    height:var(--nav-h);
+    background:rgba(245,242,236,0.92);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
+    letter-spacing:-0.02em;
+    text-decoration:none;
+    color:var(--ink);
+  }
+  .brand-avatar{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid var(--line);
+    flex-shrink:0;
+    cursor:pointer;
+    transition:transform 0.2s, box-shadow 0.2s;
+  }
+  .brand-avatar:hover{
+    transform:scale(1.06);
+    box-shadow:0 2px 12px rgba(0,0,0,0.12);
+  }
+  .nav-top .brand{ font-size:16px; }
+
+  /* sidebar — hidden on mobile */
+  .sidebar{ display:none; }
+
+  /* bottom nav — mobile only */
+  .nav-bottom{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    z-index:100;
+    height:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+    padding-bottom:env(safe-area-inset-bottom, 0px);
+    background:rgba(255,255,255,0.94);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border-top:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+  }
+  .nav-bottom a{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    text-decoration:none;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:600;
+    padding:8px 12px;
+    border-radius:12px;
+    min-width:56px;
+    transition:color 0.2s, background 0.2s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .nav-bottom a .icon{ font-size:20px; line-height:1; }
+  .nav-bottom a.active{ color:var(--ink); background:var(--bg); }
+  .nav-bottom a.active.past{ color:var(--past); background:var(--past-bg); }
+  .nav-bottom a.active.present{ color:var(--present); background:var(--present-bg); }
+  .nav-bottom a.active.future{ color:var(--future); background:var(--future-bg); }
+
+  /* layout */
+  .layout{ min-height:100vh; }
+  .main{
+    padding-bottom:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 24px);
+  }
+
+  /* hero — mobile: compact centered */
+  .hero{
+    padding:32px 20px 28px;
+    text-align:center;
+  }
+  .hero-eyebrow{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:12px;
+  }
+  .hero h1{
+    font-family:'Instrument Serif', serif;
+    font-size:clamp(36px, 10vw, 48px);
+    font-weight:400;
+    letter-spacing:-0.03em;
+    line-height:1.08;
+    margin-bottom:12px;
+  }
+  .hero h1 em{ font-style:italic; color:var(--present); }
+  .hero > p{
+    font-size:15px;
+    color:var(--muted);
+    line-height:1.55;
+    margin-bottom:24px;
+  }
+  .hero-stats{ display:none; }
+
+  .hero-tags{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-width:320px;
+    margin:0 auto;
+  }
+  .hero-tags a{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-size:14px;
+    font-weight:600;
+    text-decoration:none;
+    padding:12px 20px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .hero-tags a.tag-past{ border-color:var(--past-border); background:var(--past-bg); }
+  .hero-tags a.tag-present{ border-color:var(--present-border); background:var(--present-bg); }
+  .hero-tags a.tag-future{ border-color:var(--future-border); background:var(--future-bg); }
+
+  /* sections */
+  .section{ padding:36px 16px 8px; }
+  .section-head{
+    margin-bottom:20px;
+    padding:0 4px;
+  }
+  .section-head h2{
+    font-family:'Instrument Serif', serif;
+    font-size:28px;
+    font-weight:400;
+    letter-spacing:-0.02em;
+    margin-bottom:6px;
+  }
+  .section-head p{
+    font-size:14px;
+    color:var(--muted);
+    line-height:1.5;
+  }
+
+  .section-past{ background:var(--past-bg); border-top:1px solid var(--past-border); }
+  .section-past .section-head h2{ color:var(--past); }
+  .section-present{ background:var(--surface); border-top:1px solid var(--line); }
+  .section-present .section-head h2{ color:var(--present); }
+  .section-future{ background:var(--future-bg); border-top:1px solid var(--future-border); }
+  .section-future .section-head h2{ color:var(--future); }
+
+  /* grid — mobile: single column feed */
+  .grid{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+  }
+
+  /* post card — mobile: full-width feed style */
+  .post{
+    background:var(--surface);
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .post-meta{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 14px 0;
+  }
+  .avatar{
+    width:38px; height:38px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px;
+    flex-shrink:0;
+  }
+  .post-meta .who{ font-size:14px; font-weight:600; }
+  .post-meta .when{ font-size:11px; color:var(--muted); }
+
+  .post-img{
+    margin:10px 0 0;
+    overflow:hidden;
+    aspect-ratio:1/1;
+  }
+  .post-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+    display:block;
+  }
+
+  .post-body{ padding:12px 14px 16px; }
+  .post-body .likes{
+    font-size:12px;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .post-body .caption{
+    font-size:14px;
+    line-height:1.6;
+    color:#333;
+  }
+  .post-body .caption b{ font-weight:600; margin-right:4px; }
+
+  /* era styles */
+  .section-past .post{ background:#fffcf5; border-color:var(--past-border); }
+  .section-past .avatar{ background:var(--past); color:#fff; }
+  .section-past .post-img img{ filter:sepia(0.12) saturate(0.95); }
+  .section-past .caption b{ color:var(--past); }
+
+  .section-present .avatar{ background:var(--present); color:#fff; }
+  .section-present .caption b{ color:var(--present); }
+
+  .section-future .post{ border-color:var(--future-border); position:relative; }
+  .section-future .post::after{
+    content:'Coming soon';
+    position:absolute;
+    top:12px; right:12px;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--future);
+    background:rgba(124,58,237,0.1);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .section-future .avatar{ background:linear-gradient(135deg, #7c3aed, #2563eb); color:#fff; }
+  .section-future .caption b{ color:var(--future); }
+  .section-future .likes{ font-style:italic; color:var(--future); }
+
+  .site-footer{
+    text-align:center;
+    padding:40px 20px 24px;
+    border-top:1px solid var(--line);
+    background:var(--bg);
+  }
+  .site-footer p{ font-size:13px; color:var(--muted); }
+  .site-footer .end{
+    margin-top:8px;
+    font-family:'Instrument Serif', serif;
+    font-size:17px;
+    font-style:italic;
+    color:var(--ink);
+  }
+
+  /* ══════════════════════════════════════
+     TABLET (640px+)
+  ══════════════════════════════════════ */
+  @media(min-width:640px){
+    html{ scroll-padding-top:var(--nav-h); }
+
+    .hero{
+      padding:48px 32px 40px;
+      max-width:720px;
+      margin:0 auto;
+    }
+    .hero h1{ font-size:52px; }
+    .hero > p{ font-size:16px; max-width:480px; margin-left:auto; margin-right:auto; }
+
+    .hero-tags{
+      flex-direction:row;
+      flex-wrap:wrap;
+      justify-content:center;
+      max-width:none;
+    }
+    .hero-tags a{ flex:0 1 auto; }
+
+    .section{ padding:48px 32px 16px; }
+    .section-head{
+      max-width:960px;
+      margin-left:auto;
+      margin-right:auto;
+      margin-bottom:28px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:20px;
+    }
+    .section-head h2{ font-size:36px; margin-bottom:0; }
+    .section-head p{ max-width:340px; text-align:right; }
+
+    .grid{
+      max-width:960px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:24px;
+    }
+
+    .post-img{ margin:12px 12px 0; border-radius:12px; aspect-ratio:4/3; }
+    .post:hover{
+      transform:translateY(-3px);
+      box-shadow:0 4px 12px rgba(0,0,0,0.06), 0 16px 40px rgba(0,0,0,0.08);
+      transition:transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .post-img img{ transition:transform 0.4s ease; }
+    .post:hover .post-img img{ transform:scale(1.03); }
+  }
+
+  /* ══════════════════════════════════════
+     DESKTOP (1024px+)
+  ══════════════════════════════════════ */
+  @media(min-width:1024px){
+    html{ scroll-padding-top:32px; }
+
+    /* hide mobile navs */
+    .nav-top{ display:none; }
+    .nav-bottom{ display:none; }
+
+    .layout{
+      display:flex;
+      max-width:1280px;
+      margin:0 auto;
+      gap:0;
+    }
+
+    /* sticky sidebar */
+    .sidebar{
+      display:flex;
+      flex-direction:column;
+      position:sticky;
+      top:0;
+      height:100vh;
+      width:var(--sidebar);
+      flex-shrink:0;
+      padding:32px 20px 32px 32px;
+      border-right:1px solid var(--line);
+      background:var(--bg);
+    }
+    .sidebar .brand{
+      font-size:18px;
+      margin-bottom:8px;
+    }
+    .sidebar .brand-avatar{
+      width:40px;
+      height:40px;
+    }
+    .sidebar .tagline{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+      margin-bottom:32px;
+      padding-bottom:24px;
+      border-bottom:1px solid var(--line);
+    }
+    .sidebar-nav{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      flex:1;
+    }
+    .sidebar-nav a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:14px;
+      font-weight:500;
+      color:var(--muted);
+      text-decoration:none;
+      padding:10px 14px;
+      border-radius:10px;
+      transition:background 0.2s, color 0.2s;
+    }
+    .sidebar-nav a .num{
+      font-size:11px;
+      font-weight:700;
+      width:22px; height:22px;
+      border-radius:6px;
+      display:flex; align-items:center; justify-content:center;
+      background:var(--line);
+      color:var(--muted);
+      flex-shrink:0;
+    }
+    .sidebar-nav a:hover{ background:var(--line); color:var(--ink); }
+    .sidebar-nav a.active{ font-weight:600; }
+    .sidebar-nav a.past.active{ background:var(--past-bg); color:var(--past); }
+    .sidebar-nav a.past.active .num{ background:var(--past); color:#fff; }
+    .sidebar-nav a.present.active{ background:var(--present-bg); color:var(--present); }
+    .sidebar-nav a.present.active .num{ background:var(--present); color:#fff; }
+    .sidebar-nav a.future.active{ background:var(--future-bg); color:var(--future); }
+    .sidebar-nav a.future.active .num{ background:var(--future); color:#fff; }
+
+    .sidebar-footer{
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.5;
+      padding-top:24px;
+      border-top:1px solid var(--line);
+    }
+
+    .main{
+      flex:1;
+      min-width:0;
+      padding-bottom:0;
+    }
+
+    /* hero — desktop: split layout */
+    .hero{
+      max-width:none;
+      padding:56px 48px 48px;
+      text-align:left;
+      display:grid;
+      grid-template-columns:1fr 280px;
+      gap:40px;
+      align-items:end;
+    }
+    .hero-text{ max-width:520px; }
+    .hero h1{ font-size:64px; margin-bottom:16px; }
+    .hero > p{ margin-left:0; margin-right:0; margin-bottom:28px; }
+
+    .hero-tags{
+      flex-direction:row;
+      flex-wrap:wrap;
+      justify-content:flex-start;
+      max-width:none;
+      margin:0;
+    }
+    .hero-tags a{
+      border-radius:999px;
+      transition:transform 0.2s, box-shadow 0.2s;
+    }
+    .hero-tags a:hover{
+      transform:translateY(-2px);
+      box-shadow:var(--shadow);
+    }
+
+    .hero-stats{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .stat-card{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:16px 18px;
+      box-shadow:var(--shadow);
+    }
+    .stat-card .num{
+      font-family:'Instrument Serif', serif;
+      font-size:32px;
+      font-weight:400;
+      line-height:1;
+      margin-bottom:4px;
+    }
+    .stat-card .label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:500;
+    }
+    .stat-card.past-stat .num{ color:var(--past); }
+    .stat-card.present-stat .num{ color:var(--present); }
+    .stat-card.future-stat .num{ color:var(--future); }
+
+    .section{
+      padding:56px 48px 24px;
+    }
+    .section-head{
+      max-width:none;
+      margin-bottom:32px;
+    }
+    .section-head h2{ font-size:40px; }
+
+    .grid{
+      max-width:none;
+      grid-template-columns:repeat(3, 1fr);
+      gap:24px;
+    }
+
+    /* last item in past (7 posts) spans nicely — optional */
+    .section-future .grid{
+      grid-template-columns:repeat(3, 1fr);
+    }
+
+    .site-footer{
+      padding:56px 48px 64px;
+      text-align:left;
+    }
+  }
+
+  /* large desktop */
+  @media(min-width:1280px){
+    .hero h1{ font-size:72px; }
+    .grid{ gap:28px; }
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    html{ scroll-behavior:auto; }
+    .post:hover,.post-img img,.hero-tags a{ transition:none; }
+    .post:hover{ transform:none; }
+    .post:hover .post-img img{ transform:none; }
+  }
+
+  /* ── LIGHTBOX (desktop) ── */
+  .lightbox{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .lightbox.open{
+    opacity:1;
+    visibility:visible;
+  }
+  .lightbox-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(10,10,15,0.72);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+  .lightbox-panel{
+    position:relative;
+    display:grid;
+    grid-template-columns:1fr 380px;
+    width:100%;
+    max-width:920px;
+    max-height:85vh;
+    background:var(--surface);
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 24px 80px rgba(0,0,0,0.35);
+    transform:scale(0.94) translateY(12px);
+    transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+  }
+  .lightbox.open .lightbox-panel{
+    transform:scale(1) translateY(0);
+  }
+  .lightbox-img-wrap{
+    background:#111;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:320px;
+    overflow:hidden;
+  }
+  .lightbox-img-wrap img{
+    width:100%;
+    height:100%;
+    max-height:85vh;
+    object-fit:contain;
+    display:block;
+  }
+  .lightbox-content{
+    display:flex;
+    flex-direction:column;
+    padding:24px;
+    overflow-y:auto;
+    border-left:1px solid var(--line);
+  }
+  .lightbox-meta{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:16px;
+  }
+  .lightbox-meta .avatar{
+    width:42px; height:42px;
+    font-size:18px;
+  }
+  .lightbox-meta .who{ font-size:15px; font-weight:600; }
+  .lightbox-meta .when{ font-size:12px; color:var(--muted); margin-top:2px; }
+  .lightbox-likes{
+    font-size:13px;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:12px;
+  }
+  .lightbox-caption{
+    font-size:15px;
+    line-height:1.65;
+    color:#333;
+    flex:1;
+  }
+  .lightbox-caption b{ font-weight:600; margin-right:4px; }
+
+  .lightbox-close{
+    position:absolute;
+    top:14px; right:14px;
+    z-index:2;
+    width:36px; height:36px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,0.92);
+    color:var(--ink);
+    font-size:22px;
+    line-height:1;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+    transition:transform 0.2s, background 0.2s;
+  }
+  .lightbox-close:hover{ transform:scale(1.08); background:#fff; }
+
+  .lightbox-nav{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:2;
+    width:44px; height:44px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,0.92);
+    color:var(--ink);
+    font-size:20px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 12px rgba(0,0,0,0.2);
+    transition:transform 0.2s, opacity 0.2s;
+  }
+  .lightbox-nav:hover{ transform:translateY(-50%) scale(1.08); }
+  .lightbox-nav:disabled{ opacity:0.3; cursor:default; pointer-events:none; }
+  .lightbox-prev{ left:-56px; }
+  .lightbox-next{ right:-56px; }
+
+  .lightbox.past .lightbox-caption b{ color:var(--past); }
+  .lightbox.past .lightbox-meta .avatar{ background:var(--past); color:#fff; }
+  .lightbox.past .lightbox-img-wrap img{ filter:sepia(0.12) saturate(0.95); }
+
+  .lightbox.present .lightbox-caption b{ color:var(--present); }
+  .lightbox.present .lightbox-meta .avatar{ background:var(--present); color:#fff; }
+
+  .lightbox.future .lightbox-caption b{ color:var(--future); }
+  .lightbox.future .lightbox-meta .avatar{ background:linear-gradient(135deg, #7c3aed, #2563eb); color:#fff; }
+  .lightbox.future .lightbox-likes{ font-style:italic; color:var(--future); }
+
+  body.lightbox-open{ overflow:hidden; }
+
+  @media(min-width:1024px){
+    .post-img{
+      cursor:zoom-in;
+    }
+  }
+
+  @media(max-width:1023px){
+    .lightbox{ display:none !important; }
+  }
+
+  /* ── PROFILE VIEWER (mobile + desktop) ── */
+  .profile-viewer{
+    position:fixed;
+    inset:0;
+    z-index:1100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .profile-viewer.open{
+    opacity:1;
+    visibility:visible;
+  }
+  .profile-viewer-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(10,10,15,0.78);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+  }
+  .profile-viewer-panel{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+    transform:scale(0.92);
+    transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+  }
+  .profile-viewer.open .profile-viewer-panel{
+    transform:scale(1);
+  }
+  .profile-viewer-panel img{
+    width:min(320px, 80vw);
+    height:min(320px, 80vw);
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid #fff;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  }
+  .profile-viewer-name{
+    font-weight:700;
+    font-size:18px;
+    color:#fff;
+    letter-spacing:-0.02em;
+  }
+  .profile-viewer-close{
+    position:absolute;
+    top:-48px;
+    right:0;
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:50%;
+    background:rgba(255,255,255,0.92);
+    color:var(--ink);
+    font-size:24px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 2px 12px rgba(0,0,0,0.2);
+    transition:transform 0.2s;
+  }
+  .profile-viewer-close:hover{ transform:scale(1.08); }
+</style>
+</head>
+<body>
+
+<!-- Mobile top bar -->
+<nav class="nav-top" aria-label="Top navigation">
+  <a class="brand" href="#">
+    <img class="brand-avatar" src="profile.jpeg" alt="Bryan">
+    @bryan
+  </a>
+</nav>
+
+<div class="layout">
+
+  <!-- Desktop sidebar -->
+  <aside class="sidebar" aria-label="Section navigation">
+    <a class="brand" href="#">
+      <img class="brand-avatar" src="profile.jpeg" alt="Bryan">
+      @bryan
+    </a>
+    <p class="tagline">A life, scrolled.<br>Past · Present · Future</p>
+    <nav class="sidebar-nav">
+      <a class="past" href="#past"><span class="num">1</span> Who I was</a>
+      <a class="present" href="#present"><span class="num">2</span> Who I am</a>
+      <a class="future" href="#future"><span class="num">3</span> Who I will be</a>
+    </nav>
+    <p class="sidebar-footer">Final English Assessment</p>
+  </aside>
+
+  <div class="main">
+
+    <header class="hero">
+      <div class="hero-text">
+        <div class="hero-eyebrow">English assessment · personal feed</div>
+        <h1>A life, <em>scrolled</em></h1>
+        <p>Three chapters of the same story : who I was, who I am, and who I'm working to become.</p>
+        <div class="hero-tags">
+          <a class="tag-past" href="#past">📼 Who I was</a>
+          <a class="tag-present" href="#present">⚡ Who I am</a>
+          <a class="tag-future" href="#future">🔮 Who I will be</a>
+        </div>
+      </div>
+      <div class="hero-stats" aria-hidden="true">
+        <div class="stat-card past-stat"><div class="num">7</div><div class="label">posts · the archive</div></div>
+        <div class="stat-card present-stat"><div class="num">7</div><div class="label">posts · right now</div></div>
+        <div class="stat-card future-stat"><div class="num">3</div><div class="label">posts · coming soon</div></div>
+      </div>
+    </header>
+
+    <!-- ═══ PAST ═══ -->
+    <section class="section section-past" id="past">
+      <div class="section-head">
+        <h2>Who I was</h2>
+        <p>Growing up games, music, dreams that didn't stick, and lessons learned early.</p>
+      </div>
+      <div class="grid">
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🎮</div>
+            <div><div class="who">bryan.then</div><div class="when">growing up</div></div>
+          </div>
+          <div class="post-img"><img src="gaming.jpg" alt="Gaming setup" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">256 likes</div>
+            <div class="caption"><b>bryan.then</b> Grew up more into video games, American music, and bothering my siblings than anything else. Some things never really change.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🏀</div>
+            <div><div class="who">bryan.then</div><div class="when">a few dreams, briefly</div></div>
+          </div>
+          <div class="post-img"><img src="basketball.jpg" alt="Basketball or architecture" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">89 likes</div>
+            <div class="caption"><b>bryan.then</b> Wanted to be an architect. Then a basketball player. Dropped both within weeks and honestly, I never cared what anyone thought about it.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">📐</div>
+            <div><div class="who">bryan.then</div><div class="when">first year of university</div></div>
+          </div>
+          <div class="post-img"><img src="math.jpg" alt="Math notebook" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">61 likes</div>
+            <div class="caption"><b>bryan.then</b> First year of university math had nothing to do with high school. I remember feeling completely lost.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🎧</div>
+            <div><div class="who">bryan.then</div><div class="when">the soundtrack</div></div>
+          </div>
+          <div class="post-img"><img src="music.jpg" alt="Music and shows" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">143 likes</div>
+            <div class="caption"><b>bryan.then</b> Grew up on Chris Brown, Lil Wayne, Rae Sremmurd then Lil Yachty, Migos as the sound changed. On My Block, The Chi, every Will Smith movie. Something about how unbothered everyone seemed always stuck with me.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🛠️</div>
+            <div><div class="who">bryan.then</div><div class="when">a naive theory</div></div>
+          </div>
+          <div class="post-img"><img src="easy_theory.jpg" alt="Looked easy" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">72 likes</div>
+            <div class="caption"><b>bryan.then</b> I used to think having the skills for something meant the tasks would just be easy. Turns out that's not really how it works.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">👕</div>
+            <div><div class="who">bryan.then</div><div class="when">no filter</div></div>
+          </div>
+          <div class="post-img"><img src="no_filter.jfif" alt="Old outfit" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">54 likes</div>
+            <div class="caption"><b>bryan.then</b> I used to wear literally anything, no filter at all.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🤐</div>
+            <div><div class="who">bryan.then</div><div class="when">strangers stayed strangers</div></div>
+          </div>
+          <div class="post-img"><img src="strangers.jpg" alt="Quiet street" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">38 likes</div>
+            <div class="caption"><b>bryan.then</b> I never used to talk to strangers in the street. Wasn't really my thing.</div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ═══ PRESENT ═══ -->
+    <section class="section section-present" id="present">
+      <div class="section-head">
+        <h2>Who I am</h2>
+        <p>London, Data & AI, basketball, and friendships that shifted along the way.</p>
+      </div>
+      <div class="grid">
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">💬</div>
+            <div><div class="who">Bryan</div><div class="when">now</div></div>
+          </div>
+          <div class="post-img"><img src="confidence.jpg" alt="Confidence" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">312 likes</div>
+            <div class="caption"><b>Bryan</b> Used to be the quiet one. Now I can hold a conversation at work or in class without overthinking it. Small shift, but it changed a lot.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">📍</div>
+            <div><div class="who">Bryan</div><div class="when">London · exchange</div></div>
+          </div>
+          <div class="post-img"><img src="london.jpg" alt="London" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">147 likes</div>
+            <div class="caption"><b>Bryan</b> Moving to London for this exchange made me realize how big the world actually is. New people, a new language, way outside my comfort zone and I'd do it again.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">💻</div>
+            <div><div class="who">Bryan</div><div class="when">work-study · Data & AI</div></div>
+          </div>
+          <div class="post-img"><img src="data_ia.jpg" alt="Data AI" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">204 likes</div>
+            <div class="caption"><b>Bryan</b> The more I get into Data & AI, the more it pulls me in. The catch: this field moves fast, so staying curious isn't optional it's part of the job.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">😮‍💨</div>
+            <div><div class="who">Bryan</div><div class="when">9 to 5, then class</div></div>
+          </div>
+          <div class="post-img"><img src="9to5.jpg" alt="9 to 5" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">176 likes</div>
+            <div class="caption"><b>Bryan</b> Turns out having the skills doesn't remove the difficulty there's always something to figure out, and real pressure not to disappoint the people above you. Some of it is work that goes nowhere: you start something, and it just gets dropped. Juggling that with school is exhausting. Still love what I do though.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🏀</div>
+            <div><div class="who">Bryan</div><div class="when">still on the court</div></div>
+          </div>
+          <div class="post-img"><img src="basketball_now.jpg" alt="Basketball now" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">233 likes</div>
+            <div class="caption"><b>Bryan</b> Still play, just for fun now though there's a small part of me that still wants to make something out of it. Mostly it's how I decompress, and how I meet people. Through it I even got to meet a public figure once. Taught me a lot about being part of a team.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🚶</div>
+            <div><div class="who">Bryan</div><div class="when">weekends, exploring</div></div>
+          </div>
+          <div class="post-img"><img src="weekends.jpg" alt="Weekends" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">189 likes</div>
+            <div class="caption"><b>Bryan</b> People I barely spoke to back in Paris now we spend weekends exploring the city together, talking to strangers, just seeing where the day takes us. Funny how that changes.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🔄</div>
+            <div><div class="who">Bryan</div><div class="when">friendships shift</div></div>
+          </div>
+          <div class="post-img"><img src="friendships.jpg" alt="Friendships" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">98 likes</div>
+            <div class="caption"><b>Bryan</b> Some people I was truly close to I thought that would never change. Now we're basically acquaintances. And some I barely talked to back then are the ones I'm closest to now. Life does that.</div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ═══ FUTURE ═══ -->
+    <section class="section section-future" id="future">
+      <div class="section-head">
+        <h2>Who I will be</h2>
+        <p>The roadmap AI engineering, investing, and building something that lasts.</p>
+      </div>
+      <div class="grid">
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🧠</div>
+            <div><div class="who">bryan.next</div><div class="when">unreleased</div></div>
+          </div>
+          <div class="post-img"><img src="ai_engineer.jpg" alt="AI engineer" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">not shipped yet</div>
+            <div class="caption"><b>bryan.next</b> Starting out as a Data/AI engineer, ideally in London or the US. I've loved English since I was a kid this is where that goes.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">📈</div>
+            <div><div class="who">bryan.next</div><div class="when">unreleased</div></div>
+          </div>
+          <div class="post-img"><img src="trading.jpg" alt="Trading" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">not shipped yet</div>
+            <div class="caption"><b>bryan.next</b> On the side, I want to try things trading, investing. I don't love the idea of working for someone else forever, so this is where I start figuring out my own thing.</div>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-meta">
+            <div class="avatar">🚀</div>
+            <div><div class="who">bryan.next</div><div class="when">unreleased</div></div>
+          </div>
+          <div class="post-img"><img src="family.jpg" alt="Family" loading="lazy"></div>
+          <div class="post-body">
+            <div class="likes">not shipped yet</div>
+            <div class="caption"><b>bryan.next</b> End goal: build enough to be financially free not just for me, but to actually take care of my family and friends. I know I have to put in the years as an employee first. That's fine, that's the deal.</div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>@bryan · Final English Assessment</p>
+      <p class="end">End of feed you're all caught up.</p>
+    </footer>
+
+  </div><!-- /.main -->
+</div><!-- /.layout -->
+
+<!-- Profile viewer -->
+<div class="profile-viewer" id="profile-viewer" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Profile photo">
+  <div class="profile-viewer-backdrop" data-close-profile></div>
+  <div class="profile-viewer-panel">
+    <button class="profile-viewer-close" data-close-profile aria-label="Close">&times;</button>
+    <img id="profile-viewer-img" src="" alt="Bryan">
+    <p class="profile-viewer-name">@bryan</p>
+  </div>
+</div>
+
+<!-- Lightbox (desktop) -->
+<div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Post detail">
+  <div class="lightbox-backdrop" data-close></div>
+  <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous post">‹</button>
+  <div class="lightbox-panel">
+    <button class="lightbox-close" data-close aria-label="Close">&times;</button>
+    <div class="lightbox-img-wrap">
+      <img id="lightbox-img" src="" alt="">
+    </div>
+    <div class="lightbox-content">
+      <div class="lightbox-meta">
+        <div class="avatar" id="lightbox-avatar"></div>
+        <div>
+          <div class="who" id="lightbox-who"></div>
+          <div class="when" id="lightbox-when"></div>
+        </div>
+      </div>
+      <div class="lightbox-likes" id="lightbox-likes"></div>
+      <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+  </div>
+  <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next post">›</button>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="nav-bottom" aria-label="Section navigation">
+  <a href="#" data-section="top"><span class="icon">🏠</span>Home</a>
+  <a class="past" href="#past"><span class="icon">📼</span>Past</a>
+  <a class="present" href="#present"><span class="icon">⚡</span>Now</a>
+  <a class="future" href="#future"><span class="icon">🔮</span>Future</a>
+</nav>
+
+<script>
+  const sections = ['past', 'present', 'future'];
+  const navLinks = document.querySelectorAll('.sidebar-nav a, .nav-bottom a[href^="#"]');
+
+  function setActive(section) {
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.classList.contains(section) || link.getAttribute('href') === '#' + section) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
+  document.querySelector('.nav-bottom a[data-section="top"]')?.addEventListener('click', e => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navLinks.forEach(l => l.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+  });
+
+  /* ── Lightbox (desktop only) ── */
+  const lightbox = document.getElementById('lightbox');
+  const allPosts = [...document.querySelectorAll('.post')];
+  let currentIndex = 0;
+
+  const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
+
+  function getEra(post) {
+    const section = post.closest('.section');
+    if (section?.classList.contains('section-past')) return 'past';
+    if (section?.classList.contains('section-future')) return 'future';
+    return 'present';
+  }
+
+  function fillLightbox(post) {
+    const img = post.querySelector('.post-img img');
+    const avatar = post.querySelector('.avatar');
+    const who = post.querySelector('.who');
+    const when = post.querySelector('.when');
+    const likes = post.querySelector('.likes');
+    const caption = post.querySelector('.caption');
+
+    document.getElementById('lightbox-img').src = img.src;
+    document.getElementById('lightbox-img').alt = img.alt;
+    document.getElementById('lightbox-avatar').textContent = avatar.textContent;
+    document.getElementById('lightbox-who').textContent = who.textContent;
+    document.getElementById('lightbox-when').textContent = when.textContent;
+    document.getElementById('lightbox-likes').textContent = likes.textContent;
+    document.getElementById('lightbox-caption').innerHTML = caption.innerHTML;
+
+    lightbox.className = 'lightbox open ' + getEra(post);
+    document.getElementById('lightbox-prev').disabled = currentIndex === 0;
+    document.getElementById('lightbox-next').disabled = currentIndex === allPosts.length - 1;
+  }
+
+  function openLightbox(post) {
+    currentIndex = allPosts.indexOf(post);
+    fillLightbox(post);
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('lightbox-open');
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('lightbox-open');
+  }
+
+  document.querySelectorAll('.post-img').forEach(wrap => {
+    wrap.addEventListener('click', () => {
+      if (!isDesktop()) return;
+      openLightbox(wrap.closest('.post'));
+    });
+  });
+
+  document.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', closeLightbox);
+  });
+
+  document.getElementById('lightbox-prev').addEventListener('click', () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      fillLightbox(allPosts[currentIndex]);
+    }
+  });
+
+  document.getElementById('lightbox-next').addEventListener('click', () => {
+    if (currentIndex < allPosts.length - 1) {
+      currentIndex++;
+      fillLightbox(allPosts[currentIndex]);
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft' && currentIndex > 0) {
+      currentIndex--;
+      fillLightbox(allPosts[currentIndex]);
+    }
+    if (e.key === 'ArrowRight' && currentIndex < allPosts.length - 1) {
+      currentIndex++;
+      fillLightbox(allPosts[currentIndex]);
+    }
+  });
+
+  /* ── Profile photo viewer ── */
+  const profileViewer = document.getElementById('profile-viewer');
+  const profileViewerImg = document.getElementById('profile-viewer-img');
+
+  function openProfileViewer(src, alt) {
+    profileViewerImg.src = src;
+    profileViewerImg.alt = alt;
+    profileViewer.classList.add('open');
+    profileViewer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('lightbox-open');
+  }
+
+  function closeProfileViewer() {
+    profileViewer.classList.remove('open');
+    profileViewer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('lightbox-open');
+  }
+
+  document.querySelectorAll('.brand-avatar').forEach(img => {
+    img.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      openProfileViewer(img.src, img.alt);
+    });
+  });
+
+  document.querySelectorAll('[data-close-profile]').forEach(el => {
+    el.addEventListener('click', closeProfileViewer);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (profileViewer.classList.contains('open') && e.key === 'Escape') {
+      closeProfileViewer();
+    }
+  });
+</script>
+</body>
+</html>
